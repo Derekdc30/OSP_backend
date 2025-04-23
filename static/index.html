@@ -3,37 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Go Website</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Online Survey Platform</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to our Simple Website</h1>
-        <p>This is a demonstration of Go backend with HTML frontend interaction.</p>
-        
-        <form id="greetForm" action="/greet" method="POST">
-            <label for="name">Enter your name:</label>
-            <input type="text" id="name" name="name" required>
-            <button type="submit">Greet Me</button>
-        </form>
-        
-        <div id="responseArea"></div>
+        <h1>Online Survey Platform</h1>
+        <div class="token-entry">
+            <h2>Enter Survey Token</h2>
+            <input type="text" id="tokenInput" placeholder="Enter 5-character token" maxlength="5">
+            <button id="submitToken">Start Survey</button>
+            <p id="errorMessage" class="error"></p>
+        </div>
     </div>
-
-    <script>
-        // Optional JavaScript for enhanced interactivity
-        document.getElementById('greetForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const response = await fetch('/greet', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const html = await response.text();
-            document.getElementById('responseArea').innerHTML = html;
-        });
-    </script>
+    <script src="/static/js/index.js"></script>
 </body>
 </html>
