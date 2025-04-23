@@ -14,7 +14,7 @@ func NewRouter() *http.ServeMux {
 
 	// Static files
 	fs := http.FileServer(http.Dir("static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	mux.Handle("/", fs)
 
 	// // Redirect root
 	// mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
