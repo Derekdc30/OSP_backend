@@ -4,36 +4,57 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
+)
+
+var (
+	Client    *mongo.Client
+	database  *mongo.Database
+	surveys   *mongo.Collection
+	questions *mongo.Collection
+	responses *mongo.Collection
 )
 
 func InitDB() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	mongoClient, err := mongo.Connect(
-		ctx,
-		options.Client().ApplyURI("mongodb://admin:password@localhost:27017/"),
-	)
+	defer cancel()
 
-	defer func() {
-		cancel()
-		if err := mongoClient.Disconnect(ctx); err != nil {
-			log.Fatalf("mongodb disconnect error : %v", err)
-		}
-	}()
-
+	// Get Atlas connection string from environment variable
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("connection error :%v", err)
-		return
+		log.Fatal("Error loading .env file")
 	}
 
-	err = mongoClient.Ping(ctx, readpref.Primary())
+	uri := os.Getenv("MONGODB_URI")
+
+	// Set client options and connect
+	clientOptions := options.Client().ApplyURI(uri)
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Fatalf("ping mongodb error :%v", err)
-		return
+		log.Fatalf("Failed to connect to MongoDB Atlas: %v", err)
 	}
-	fmt.Println("ping success")
+
+	// Verify connection
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatalf("Failed to ping MongoDB Atlas: %v", err)
+	}
+
+	fmt.Println("Successfully connected to MongoDB Atlas!")
+
+	// Set global variables
+	Client = client
+	database = Client.Database("OSP_backend")
+	surveys = database.Collection("surveys")
+	questions = database.Collection("questions")
+	responses = database.Collection("responses")
+}
+
+func GetCollection(name string) *mongo.Collection {
+	return database.Collection(name)
 }
