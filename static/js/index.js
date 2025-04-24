@@ -1,34 +1,34 @@
-document.getElementById('submitToken').addEventListener('click', async function(e) {
-    e.preventDefault();
-    
-    const tokenInput = document.getElementById('tokenInput').value;
-    const errorMessage = document.getElementById('errorMessage');
-    
+document.getElementById('submitToken').addEventListener('click', async () => {
+    const token = document.getElementById('tokenInput').value.trim();
+    const errorElement = document.getElementById('errorMessage');
+
+    if (!token || token.length !== 5) {
+        errorElement.textContent = 'Token must be exactly 5 characters';
+        errorElement.style.display = 'block';
+        return;
+    }
+
     try {
-        const response = await fetch('/api/post', {
+        const response = await fetch(`/api/check-token`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
             },
-            body: `token=${encodeURIComponent(tokenInput)}`
+            body: JSON.stringify({ token })
         });
 
-        const result = await response.text();
-        
-        if (!response.ok) {
-            errorMessage.textContent = result;
-            errorMessage.style.color = 'red';
-            return;
+        if (response.ok) {
+            window.location.href = `survey.html?token=${token}`;
+        } else {
+            throw new Error('Invalid token');
         }
-
-        errorMessage.textContent = result;
-        errorMessage.style.color = 'green';
-        
-        // Add redirect logic here if needed
-        // window.location.href = '/survey-page';
-
     } catch (error) {
-        errorMessage.textContent = `Network error: ${error.message}`;
-        errorMessage.style.color = 'red';
+        errorElement.textContent = 'Invalid token. Please try again.';
+        errorElement.style.display = 'block';
+    }
+});
+document.getElementById('tokenInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('submitToken').click();
     }
 });

@@ -11,15 +11,10 @@ func NewRouter() *http.ServeMux {
 	// API routes
 	mux.HandleFunc("POST /api/post", handlers.HandlePost)
 	mux.HandleFunc("POST /api/check-token", handlers.HandleCheckToken)
-
+	mux.HandleFunc("GET /api/surveys/{token}", handlers.HandleGetSurvey)
 	// Static files
 	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("/", fs)
-
-	// // Redirect root
-	// mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-	// 	http.Redirect(w, r, "/static/index.html", http.StatusSeeOther)
-	// })
 
 	return mux
 }
