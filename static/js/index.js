@@ -1,4 +1,5 @@
 document.getElementById('submitToken').addEventListener('click', async () => {
+    // Validate and submit survey token
     const token = document.getElementById('tokenInput').value.trim();
     const errorElement = document.getElementById('errorMessage');
 
@@ -28,6 +29,7 @@ document.getElementById('submitToken').addEventListener('click', async () => {
     }
 });
 document.getElementById('tokenInput').addEventListener('keypress', (e) => {
+    // Handle Enter key for token input
     if (e.key === 'Enter') {
         document.getElementById('submitToken').click();
     }

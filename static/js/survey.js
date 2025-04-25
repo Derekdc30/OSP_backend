@@ -26,6 +26,7 @@ async function loadSurvey() {
     }
 }
 
+// Render survey form
 function renderSurvey(survey) {
     const container = document.getElementById('surveyContainer');
     container.innerHTML = `
@@ -47,6 +48,7 @@ function renderSurvey(survey) {
     document.getElementById('surveyForm').addEventListener('submit', handleSubmit);
 }
 
+// Render question input fields
 function renderQuestionInput(question) {
     switch (question.Format) {
         case 'textbox':
@@ -72,6 +74,7 @@ function renderQuestionInput(question) {
     }
 }
 
+// Handle survey submission
 async function handleSubmit(e) {
     e.preventDefault();
     

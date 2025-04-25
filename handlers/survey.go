@@ -4,83 +4,66 @@ import (
 	"backend/db"
 	"backend/db/models"
 	"context"
-	"fmt"
-	"log"
-	"time"
+	"encoding/json"
+	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func TestCreateSurvey() {
-	// Fixed token for testing
-	token := "ABC12"
-
-	// Sample questions
-	questions := []models.Question{
-		{
-			Text:       "What is your name?",
-			Format:     "textbox",
-			IsRequired: true,
-		},
-		{
-			Text:       "Choose your favorite color",
-			Format:     "multiple_choice",
-			Options:    []string{"Red", "Blue", "Green"},
-			IsRequired: true,
-		},
-		{
-			Text:        "Rate your satisfaction (1-5)",
-			Format:      "likert",
-			LikertScale: []string{"1", "2", "3", "4", "5"},
-			IsRequired:  false,
-		},
+// HandleCheckToken validates survey token
+func HandleCheckToken(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		Token string `json:"token"`
 	}
 
-	// Create survey object
-	survey := models.Survey{
-		Title:     "Sample Survey",
-		Token:     token,
-		Questions: questions,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	// Insert into database
-	collection := db.GetCollection("surveys")
-	_, err := collection.InsertOne(context.Background(), survey)
-	if err != nil {
-		log.Printf("Failed to insert sample survey: %v", err)
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-	fmt.Printf("Successfully inserted sample survey with token: %s\n", token)
+
+	collection := db.GetCollection("surveys")
+
+	// Using FindOne to check if token exists
+	var result struct {
+		Token string `bson:"token"`
+	}
+
+	err := collection.FindOne(
+		context.Background(),
+		bson.M{"token": request.Token},
+		options.FindOne().SetProjection(bson.M{"token": 1}),
+	).Decode(&result)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			http.Error(w, "Invalid token", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status": "valid",
+		"token":  result.Token,
+	})
 }
 
-func TestGetSurvey(token string) {
+// HandleGetSurvey retrieves survey by token
+func HandleGetSurvey(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
 	collection := db.GetCollection("surveys")
-	filter := bson.M{"token": token}
 
 	var survey models.Survey
-	err := collection.FindOne(context.Background(), filter).Decode(&survey)
+	err := collection.FindOne(context.Background(), bson.M{"token": token}).Decode(&survey)
 	if err != nil {
-		log.Printf("Failed to retrieve survey with token %s: %v", token, err)
+		http.Error(w, "Survey not found", http.StatusNotFound)
 		return
 	}
 
-	// Display survey details
-	fmt.Println("\nRetrieved Survey Details:")
-	fmt.Printf("Title: %s\n", survey.Title)
-	fmt.Printf("Token: %s\n", survey.Token)
-	fmt.Println("Questions:")
-	for i, q := range survey.Questions {
-		fmt.Printf("  %d. %s\n", i+1, q.Text)
-		fmt.Printf("     Format: %s\n", q.Format)
-		if q.Format == "multiple_choice" {
-			fmt.Printf("     Options: %v\n", q.Options)
-		} else if q.Format == "likert" {
-			fmt.Printf("     Likert Scale: %v\n", q.LikertScale)
-		}
-		fmt.Printf("     Required: %t\n", q.IsRequired)
-	}
-	fmt.Printf("Created At: %s\n", survey.CreatedAt.Format(time.RFC3339))
-	fmt.Printf("Updated At: %s\n", survey.UpdatedAt.Format(time.RFC3339))
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(survey)
 }

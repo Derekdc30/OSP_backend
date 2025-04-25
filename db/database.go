@@ -20,6 +20,7 @@ var (
 	responses *mongo.Collection
 )
 
+// InitDB initializes MongoDB connection
 func InitDB() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -55,6 +56,7 @@ func InitDB() {
 	responses = database.Collection("responses")
 }
 
+// GetCollection retrieves a MongoDB collection by name
 func GetCollection(name string) *mongo.Collection {
 	return database.Collection(name)
 }

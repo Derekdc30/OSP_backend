@@ -78,3 +78,96 @@ button:hover {
 .hidden {
     display: none;
 }
+
+.admin-access {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.admin-access button {
+    background-color: #28a745;
+    padding: 8px 15px;
+    font-size: 0.9em;
+}
+
+.admin-access button:hover {
+    background-color: #218838;
+}
+
+.admin-login {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-login input {
+    margin: 10px 0;
+}
+
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.survey-list {
+    display: grid;
+    gap: 20px;
+}
+
+.survey-item {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-editor {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.options {
+    margin: 10px 0;
+}
+
+.options input {
+    margin: 5px 0;
+}
+
+.response-container {
+    margin: 20px 0;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.response-item {
+    margin: 15px 0;
+    padding: 10px;
+    border-left: 3px solid #007bff;
+}
+.answer-item {
+    margin: 5px 0;
+    padding: 5px;
+}
+
+/* Add to existing styles */
+.response-meta {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.answer-item {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
