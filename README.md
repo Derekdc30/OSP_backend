@@ -16,6 +16,7 @@
 1. Clone the repository:
 
 2. Create a `.env` file in the root directory:
+    (ADMIN_TOKEN is for admin login)
     ```env
     MONGODB_URI=<your-MongoDB-URI>
     ADMIN_TOKEN=<your-admin-token>
